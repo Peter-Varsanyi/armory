@@ -34,7 +34,6 @@ public class HomeController {
         try {
             final List<String> guildmembers = p.getNamesBasedOnRank("Feritas", "Ragnaros", 2);
             session.setAttribute("progress", guildmembers);
-            //            model.addAttribute("progress", p.getNamesBasedOnRank("Feritas", "Ragnaros", 2).toString());
 
         } catch (final IOException e) {
             // TODO Auto-generated catch block
