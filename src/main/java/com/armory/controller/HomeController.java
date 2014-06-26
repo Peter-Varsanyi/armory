@@ -1,8 +1,6 @@
 package com.armory.controller;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -14,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.armory.domain.Parser;
+import com.armory.domain.BackgroundFetcher;
 
 @Controller
 @Scope("session")
@@ -30,16 +28,12 @@ public class HomeController {
 
     @RequestMapping("/start")
     public String startCheck(final Model model, final HttpSession session) {
-        final Parser p = new Parser();
-        try {
-            final List<String> guildmembers = p.getNamesBasedOnRank("Feritas", "Ragnaros", 2);
-            session.setAttribute("progress", guildmembers);
+        final BackgroundFetcher backgroundFetcher = new BackgroundFetcher();
+        new Thread(backgroundFetcher).start();
+        session.setAttribute("fetcher", backgroundFetcher);
 
-        } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return "start";
+        // TODO Auto-generated catch block
+        return "redirect:/";
     }
 
 }

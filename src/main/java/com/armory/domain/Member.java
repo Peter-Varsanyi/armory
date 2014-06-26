@@ -25,6 +25,10 @@ public class Member {
         return builder.toString();
     }
 
+    public int getLevel() {
+        return (int) character.get("level");
+    }
+
     public int getRank() {
         return rank;
     }

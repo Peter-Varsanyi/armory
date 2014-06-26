@@ -47,6 +47,8 @@ public class Character {
         builder.append(bestItemLevel);
         builder.append(", currentItemLevel=");
         builder.append(currentItemLevel);
+        builder.append(", name=");
+        builder.append(name);
         builder.append(", stats=");
         builder.append(stats);
         builder.append(", errors=");

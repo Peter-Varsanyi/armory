@@ -1,7 +1,7 @@
 package com.armory.domain;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -11,7 +11,6 @@ import java.util.List;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -22,13 +21,16 @@ public class Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
-    public List<String> getNamesBasedOnRank(final String guildName, final String realmName, final Integer requiredRank) throws JsonParseException,
-        JsonMappingException, MalformedURLException, IOException {
+    public List<String> getNamesBasedOnRank(final String guildName, final String realmName, final List<Integer> ranksToCheck)
+        throws JsonParseException, JsonMappingException, MalformedURLException, IOException {
+
         final ObjectMapper mapper = new ObjectMapper();
         final Guild guild = mapper.readValue(new URL("http://eu.battle.net/api/wow/guild/" + realmName + "/Feritas?fields=members"), Guild.class);
         final List<String> matchedMembers = new ArrayList<>();
         for (final Member member : guild.getMembers()) {
-            if (member.getRank() <= requiredRank) {
+            LOGGER.debug("A: {}", member.getCharacter().get("level").getClass());
+
+            if (ranksToCheck.contains(member.getRank()) && member.getLevel() == 90) {
                 final String name = (String) member.getCharacter().get("name");
                 matchedMembers.add(name);
             }
@@ -36,16 +38,22 @@ public class Parser {
         return matchedMembers;
     }
 
-    public Character getCharacter(final String name) throws IOException {
+    public Character getCharacter(final String name) {
 
         LOGGER.debug("Getting character: {}", name);
-
-        final String url = "http://eu.battle.net/wow/en/character/ragnaros/" + URLEncoder.encode(name, "UTF-8") + "/advanced";
-        LOGGER.debug(url);
+        String url = null;
+        try {
+            url = "http://eu.battle.net/wow/en/character/ragnaros/" + URLEncoder.encode(name, "UTF-8") + "/advanced";
+        } catch (final UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        }
+        System.out.println(url);
         Element document = null;
         try {
+            LOGGER.debug("Getting url: " + url);
+
             document = Jsoup.connect(url).get();
-        } catch (final HttpStatusException e) {
+        } catch (final IOException e) {
             LOGGER.error("Exception caught: {}", e);
             final Character dummy = new Character(name);
             dummy.addError("Parse error");
@@ -76,13 +84,13 @@ public class Parser {
     }
 
     public void Parse() throws IOException {
-        final List<String> guildMembers = getNamesBasedOnRank("Feritas", "Ragnaros", 2);
-        final List<Character> characters = new ArrayList<>();
-        for (final String name : guildMembers) {
-            final Character character = getCharacter(name);
-            characters.add(character);
-        }
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.writerWithDefaultPrettyPrinter().writeValue(new File("d:\\errors.json"), characters);
+        //        final List<String> guildMembers = getNamesBasedOnRank("Feritas", "Ragnaros", 2);
+        //        final List<Character> characters = new ArrayList<>();
+        //        for (final String name : guildMembers) {
+        //            final Character character = getCharacter(name);
+        //            characters.add(character);
+        //        }
+        //        final ObjectMapper mapper = new ObjectMapper();
+        //        mapper.writerWithDefaultPrettyPrinter().writeValue(new File("d:\\errors.json"), characters);
     }
 }

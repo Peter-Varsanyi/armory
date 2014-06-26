@@ -4,13 +4,6 @@
 
 <div class="mastfoot">
 	<div class="inner">
-		<p>
-			forrás: <a
-				href="http://rationalwiki.org/wiki/List_of_predictions_of_the_end_of_the_world">RationaWiki</a>
-		</p>
-		<p>
-			admin email: mikorhalokmeg@epam.com</a>
-		</p>
 	</div>
 </div>
 
